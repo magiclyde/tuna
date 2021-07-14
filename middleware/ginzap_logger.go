@@ -11,9 +11,9 @@ package middleware
 import (
 	"bytes"
 	"github.com/gin-gonic/gin"
-	"github.com/syyongx/php2go"
 	"go.uber.org/zap"
 	"io/ioutil"
+	"strings"
 	"time"
 )
 
@@ -45,8 +45,13 @@ func GinZapLogger(logger *zap.Logger, skipPaths []string) gin.HandlerFunc {
 		query := c.Request.URL.RawQuery
 		c.Next()
 
-		if php2go.InArray(path, skipPaths) {
-			return
+		for _, skipPath := range skipPaths {
+			if path == skipPath {
+				return
+			}
+			if strings.HasPrefix(path, skipPath) {
+				return
+			}
 		}
 
 		end := time.Now()
